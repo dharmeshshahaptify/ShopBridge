@@ -1,7 +1,9 @@
+﻿using DAL;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -27,10 +29,20 @@ namespace ShopBridgeAPI
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers();
+            services.AddDbContext<ShopbridgedbContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("DbConnection"));
+            });
+            services.AddControllers().AddXmlSerializerFormatters()
+                 .AddXmlDataContractSeria‌​lizerFormatters()
+                  .AddJsonOptions(options =>
+                  {
+                      options.JsonSerializerOptions.PropertyNamingPolicy = null;
+                  });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ShopBridgeAPI", Version = "v1" });
+                c.EnableAnnotations();
             });
         }
 
@@ -40,9 +52,12 @@ namespace ShopBridgeAPI
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ShopBridgeAPI v1"));
+              
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ShopBridgeAPI v1"));
+
 
             app.UseHttpsRedirection();
 
