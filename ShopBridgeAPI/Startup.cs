@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using ShopBridge.Service.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,10 +30,14 @@ namespace ShopBridgeAPI
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddDbContext<ShopbridgedbContext>(options =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString("DbConnection"));
-            });
+            //services.AddDbContext<ShopbridgedbContext>(options =>
+            //{
+            //    options.UseSqlServer(Configuration.GetConnectionString("DbConnection"));
+            //});
+
+            ConfigureDependencies.ConfigureServices(services, Configuration);
+
+
             services.AddControllers().AddXmlSerializerFormatters()
                  .AddXmlDataContractSeria‌​lizerFormatters()
                   .AddJsonOptions(options =>

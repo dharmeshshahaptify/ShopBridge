@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DAL\DAL.csproj" />
+    <ProjectReference Include="..\ShopBridge.Service\ShopBridge.Service.csproj" />
   </ItemGroup>
 
 </Project>

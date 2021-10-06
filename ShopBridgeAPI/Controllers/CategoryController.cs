@@ -7,19 +7,21 @@ using System.Threading.Tasks;
 
 namespace ShopBridgeAPI.Controllers
 {
-    public class CategoryController : Controller
-    {
-        private ShopbridgedbContext _db;
-        public CategoryController(ShopbridgedbContext db)
-        {
-            _db = db;
-        }
+    // Need to Update based on Repository Pattern
 
-        [HttpGet]
-        public ActionResult<IEnumerable<Category>> GetAll()
-        {
-            var data = _db.Categories.ToList();
-            return Ok(data);
-        }
-    }
+    //public class CategoryController : Controller
+    //{
+    //    private ShopbridgedbContext _db;
+    //    public CategoryController(ShopbridgedbContext db)
+    //    {
+    //        _db = db;
+    //    }
+
+    //    [HttpGet]
+    //    public ActionResult<IEnumerable<Category>> GetAll()
+    //    {
+    //        var data = _db.Categories.ToList();
+    //        return Ok(data);
+    //    }
+    //}
 }

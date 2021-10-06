@@ -1,6 +1,7 @@
 ﻿using DAL;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ShopBridge.Service.Interfaces;
 using ShopBridgeAPI.Helper;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
@@ -15,11 +16,12 @@ namespace ShopBridgeAPI.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        private ShopbridgedbContext _db;
+        // private ShopbridgedbContext _db;
+        IProductService _productService;
 
-        public ProductController(ShopbridgedbContext db)
+        public ProductController(IProductService productService)
         {
-            _db = db;
+            _productService = productService;
         }
 
         //[Produces("application/json")]
@@ -32,7 +34,7 @@ namespace ShopBridgeAPI.Controllers
             try
             {
 
-                var data = _db.Products.ToList();
+                var data = _productService.GetProducts();
                 return Ok(data);
 
             }
@@ -53,7 +55,7 @@ namespace ShopBridgeAPI.Controllers
         {
             try
             {
-                var prod = _db.Products.Find(id);
+                var prod = _productService.GetProduct(id);
                 if (prod is null)
                 {
                     return StatusCode(StatusCodes.Status404NotFound);
@@ -78,7 +80,7 @@ namespace ShopBridgeAPI.Controllers
             //Filtering logic  
             Func<SampleFilterModel, IEnumerable<Product>> filterData = (filterModel) =>
             {
-                return _db.Products.Where(p => p.Name.StartsWith(filterModel.Term ?? String.Empty))
+                return _productService.GetProducts().Where(p => p.Name.StartsWith(filterModel.Term ?? String.Empty))
                 .Skip((filterModel.Page - 1) * filter.Limit)
                 .Take(filterModel.Limit);
             };
@@ -113,8 +115,7 @@ namespace ShopBridgeAPI.Controllers
             
             try
             {
-                _db.Products.Add(model);
-                _db.SaveChanges();
+                _productService.AddProduct(model);
                 return StatusCode(StatusCodes.Status201Created);
             }
             catch (Exception ex)
@@ -135,8 +136,8 @@ namespace ShopBridgeAPI.Controllers
                 if (id != model.ProductId)
                     return BadRequest();
 
-                _db.Products.Update(model);
-                _db.SaveChanges();
+                _productService.UpdateProduct(model);
+
                 return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
@@ -145,24 +146,24 @@ namespace ShopBridgeAPI.Controllers
             }
         }
 
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [SwaggerOperation("Mofidy Product Name", "Update Product Name By ID")]
-        [HttpPatch]
-        public IActionResult Modify(Product model)
-        {
-            try
-            {
-                Product data = _db.Products.Find(model.ProductId);
-                data.Name = model.Name;
-                _db.SaveChanges();
-                return StatusCode(StatusCodes.Status200OK);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        //[SwaggerOperation("Mofidy Product Name", "Update Product Name By ID")]
+        //[HttpPatch]
+        //public IActionResult Modify(Product model)
+        //{
+        //    try
+        //    {
+        //        Product data = _db.Products.Find(model.ProductId);
+        //        data.Name = model.Name;
+        //        _db.SaveChanges();
+        //        return StatusCode(StatusCodes.Status200OK);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError);
+        //    }
+        //}
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status304NotModified)]
@@ -173,11 +174,11 @@ namespace ShopBridgeAPI.Controllers
         {
             try
             {
-                Product model = _db.Products.Find(id);
+                Product model = _productService.GetProduct(id);
                 if (model != null)
                 {
-                    _db.Products.Remove(model);
-                    _db.SaveChanges();
+                    _productService.DeleteProduct(id);
+                   
                     return StatusCode(StatusCodes.Status200OK);
                 }
                 return StatusCode(StatusCodes.Status304NotModified);
